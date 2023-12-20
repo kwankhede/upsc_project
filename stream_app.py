@@ -2,16 +2,14 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
 
 # Load data
 df = pd.read_csv("upsc.csv")
 
 # Added three new columns for adjusting marks scale
-df["interview"] = (df.ptpct * 275).astype(int)
-df["written"] = (df.wtpct * 1750).round().astype(int)
-df["total"] = (df.ftpct * 2025).round().astype(int)
-
+df["interview"] = (df.ptpct * 275).apply(int)
+df["written"] = (df.wtpct * 1750).apply(round).apply(int)
+df["total"] = (df.ftpct * 2025).apply(round).apply(int)
 
 # Fixed colors for each 'Comm' category
 comm_colors = {
@@ -55,8 +53,6 @@ interview_range = st.slider(
     default_interview_range,
     step=25,
 )
-
-
 
 # Year slider
 year_range = st.slider(
