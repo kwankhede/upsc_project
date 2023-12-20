@@ -1,12 +1,11 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 
 # Load data
 df = pd.read_csv("upsc.csv")
 
-# Added three new columns for adjusting marks scale
+# Add three new columns for adjusting the marks scale
 df["interview"] = (df.ptpct * 275).apply(int)
 df["written"] = (df.wtpct * 1750).apply(round).apply(int)
 df["total"] = (df.ftpct * 2025).apply(round).apply(int)
@@ -20,7 +19,7 @@ comm_colors = {
 }
 
 # Streamlit app
-st.title("UPSC Result (2007-2017) : Data Analysis ")
+st.title("UPSC Result (2007-2017): Data Analysis")
 st.markdown("")
 st.markdown("")
 
@@ -37,7 +36,7 @@ default_year_range = (2007, 2017)
 
 # Dropdown for filtering by 'category'
 selected_comm = st.sidebar.multiselect(
-    "Select Category (s)", df["category"].unique(), default_comm
+    "Select Category(s)", df["category"].unique(), default_comm
 )
 
 # Slider for filtering by 'written'
@@ -91,7 +90,6 @@ filtered_df = df[
     & (df["rank"] <= rank_range[1])
 ]
 
-
 ########################################################################################
 # Scatter plot with fixed color mapping
 scatter_fig = px.scatter(
@@ -112,7 +110,6 @@ st.plotly_chart(scatter_fig)
 st.markdown("")
 st.markdown("")
 
-
 ###################################################################################################################
 
 # Pie chart
@@ -132,12 +129,11 @@ pie_fig.update_traces(
 )
 
 # Comments for Pie chart
-st.header("Categories wise candidates distribution")
+st.header("Categories-wise Candidates Distribution")
 st.plotly_chart(pie_fig)
 
 st.markdown("")
 st.markdown("")
-
 
 ###################################################################################################################
 # Box plot for 'interview'
@@ -181,7 +177,7 @@ box_fig.update_layout(
 )
 
 # Comments for Box plot
-st.header("Distribution of Categories Wise Interview Marks)")
+st.header("Distribution of Categories Wise Interview Marks")
 st.plotly_chart(box_fig)
 st.markdown("")
 st.markdown("")
@@ -233,7 +229,6 @@ st.plotly_chart(box_fig_written)
 st.markdown("")
 st.markdown("")
 
-
 ###################################################################################################################
 # ...
 
@@ -282,7 +277,6 @@ st.header("Distribution of Written Marks")
 st.plotly_chart(fig_written)
 
 # ...
-
 
 # Add another blank row with an empty string
 st.markdown("")
