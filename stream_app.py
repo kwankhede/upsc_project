@@ -72,6 +72,7 @@ rank_range = st.slider(
     step=25,
 )
 
+
 # Filter the DataFrame based on user input
 filtered_df = df[
     (df["category"].isin(selected_comm))
