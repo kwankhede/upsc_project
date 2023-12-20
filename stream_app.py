@@ -38,6 +38,7 @@ default_year_range = (2007, 2017)
 # Dropdown for filtering by 'category'
 selected_comm = st.multiselect("Select Category", df["category"].unique(), default_comm)
 
+# Slider for filtering by 'written'
 written_range = st.slider(
     "Select range for written marks",
     int(df["written"].min()),
@@ -46,6 +47,7 @@ written_range = st.slider(
     step=25,
 )
 
+# Slider for filtering by 'interview'
 interview_range = st.slider(
     "Select range for interview marks",
     int(df["interview"].min()),
@@ -53,6 +55,7 @@ interview_range = st.slider(
     default_interview_range,
     step=25,
 )
+
 
 
 # Year slider
