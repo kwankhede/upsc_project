@@ -39,13 +39,14 @@ default_year_range = (2007, 2017)
 selected_comm = st.multiselect("Select Category", df["category"].unique(), default_comm)
 
 # Slider for filtering by 'written'
-written_range = st.slider(
+w_total_range = st.slider(
     "Select range for written marks",
-    df["written"].min(),
-    df["written"].max(),
-    default_written_range,
+    int(upsc_2022_df["W_total"].min()),
+    int(upsc_2022_df["W_total"].max()),
+    (int(default_w_total_range[0]), int(default_w_total_range[1])),
     step=25,
 )
+
 
 # Slider for filtering by 'interview'
 interview_range = st.slider(
