@@ -14,7 +14,7 @@ df["total"] = (df.ftpct * 2025).apply(round).apply(int)
 # Fixed colors for each 'Comm' category
 comm_colors = {
     "OBC": "rgb(251,180,174)",  # Pastel1[0]
-    "SC": "rgb(179,205, 227)",  # Pastel1[1]
+    "SC": "rgb(204,235, 197)",  # Pastel1[1]
     "ST": "rgb(222, 203, 228)",  # Pastel1[3]
     "GEN": "rgb(254, 217, 166)",  # Pastel1[4]
 }
@@ -24,7 +24,9 @@ st.title("UPSC Result (2007-2017) : Data Analysis ")
 st.markdown("")
 st.markdown("")
 
-st.header("Select Parameters for Customized Visualizations")
+# Sidebar for sliders
+st.sidebar.header("Select Parameters")
+st.sidebar.markdown("Customize your analysis")
 
 # Default values for range, year, and all data
 default_comm = df["category"].unique()
@@ -34,10 +36,12 @@ default_rank_range = (1, 1250)
 default_year_range = (2007, 2017)
 
 # Dropdown for filtering by 'category'
-selected_comm = st.multiselect("Select Category", df["category"].unique(), default_comm)
+selected_comm = st.sidebar.multiselect(
+    "Select Category (s)", df["category"].unique(), default_comm
+)
 
 # Slider for filtering by 'written'
-written_range = st.slider(
+written_range = st.sidebar.slider(
     "Select range for written marks",
     int(df["written"].min()),
     int(df["written"].max()),
@@ -46,7 +50,7 @@ written_range = st.slider(
 )
 
 # Slider for filtering by 'interview'
-interview_range = st.slider(
+interview_range = st.sidebar.slider(
     "Select range for interview marks",
     int(df["interview"].min()),
     int(df["interview"].max()),
@@ -55,7 +59,7 @@ interview_range = st.slider(
 )
 
 # Year slider
-year_range = st.slider(
+year_range = st.sidebar.slider(
     "Select range for UPSC Exam Year",
     2007,
     2017,
@@ -64,7 +68,7 @@ year_range = st.slider(
 )
 
 # Slider for filtering by 'rank'
-rank_range = st.slider(
+rank_range = st.sidebar.slider(
     "Select range for UPSC All India Ranks to display",
     1,
     1250,
@@ -72,6 +76,7 @@ rank_range = st.slider(
     step=25,
 )
 
+# ...
 
 # Filter the DataFrame based on user input
 filtered_df = df[
@@ -86,6 +91,8 @@ filtered_df = df[
     & (df["rank"] <= rank_range[1])
 ]
 
+
+########################################################################################
 # Scatter plot with fixed color mapping
 scatter_fig = px.scatter(
     filtered_df,
@@ -93,17 +100,18 @@ scatter_fig = px.scatter(
     y="interview",
     color="category",
     color_discrete_map=comm_colors,
-    title="Interview vs Written Marks in UPSC by Categories",
+    title="",
 )
 
 # Add x and y-axis labels
 scatter_fig.update_layout(xaxis_title="Written Marks", yaxis_title="Interview Marks")
 
-# Comments for Scatter plot
-st.header("Scatter Plot")
+# Show plot
+st.header("Interview vs Written Marks by Categories")
 st.plotly_chart(scatter_fig)
 st.markdown("")
 st.markdown("")
+
 
 ###################################################################################################################
 
@@ -116,7 +124,7 @@ pie_fig = px.pie(
     hole=0.3,
     color=comm_counts.index,
     color_discrete_map=comm_colors,
-    title="Interview vs Written Marks in UPSC by Categories",
+    title="",
     opacity=0.7,
 )
 pie_fig.update_traces(
@@ -124,7 +132,7 @@ pie_fig.update_traces(
 )
 
 # Comments for Pie chart
-st.write("# Pie Chart")
+st.header("Categories wise candidates distribution")
 st.plotly_chart(pie_fig)
 
 st.markdown("")
@@ -141,7 +149,7 @@ box_fig = px.box(
     labels={"interview": "Interview Marks", "category": "Categories"},
     category_orders={"category": selected_comm},
     color_discrete_map=comm_colors,
-    title="Distribution of Categories Wise Interview Marks",
+    title="",
 )
 
 # Add a vertical line for the full data median
@@ -173,7 +181,7 @@ box_fig.update_layout(
 )
 
 # Comments for Box plot
-st.write("# Box Plot (Interview Marks)")
+st.header("Distribution of Categories Wise Interview Marks)")
 st.plotly_chart(box_fig)
 st.markdown("")
 st.markdown("")
@@ -188,7 +196,7 @@ box_fig_written = px.box(
     labels={"written": "Written Marks", "category": "Categories"},
     category_orders={"category": selected_comm},
     color_discrete_map=comm_colors,
-    title="Distribution of Categories Wise Written Marks",
+    title="",
 )
 
 # Add a vertical line for the full data median
@@ -220,67 +228,61 @@ box_fig_written.update_layout(
 )
 
 # Comments for Box plot (Written Marks)
-st.write("# Box Plot (Written Marks)")
+st.header("Distribution of Categories Wise Written Marks")
 st.plotly_chart(box_fig_written)
 st.markdown("")
 st.markdown("")
 
 
 ###################################################################################################################
-# Add histograms for 'interview'
-fig_interview = go.Figure()
+# ...
 
-for comm, color in comm_colors.items():
-    hist_data_comm = filtered_df[filtered_df["category"] == comm]["interview"]
-    fig_interview.add_trace(
-        go.Histogram(
-            x=hist_data_comm,
-            histnorm="probability",
-            name=comm,
-            marker_color=f"{color}",
-            opacity=0.7,
-        )
-    )
+# Add histograms for 'interview'
+fig_interview = px.histogram(
+    filtered_df,
+    x="interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    marginal="box",
+    hover_data=filtered_df.columns,
+    nbins=20,
+    title="",
+)
 
 fig_interview.update_layout(
-    barmode="overlay",
-    title_text="Distribution of Interview Marks",
     xaxis_title="Interview Marks",
-    yaxis_title="Probability",
+    yaxis_title="Frequency",
 )
 
 # Comments for Histogram (Interview Marks)
-st.write("# Histogram (Interview Marks)")
+st.header("Distribution of Interview Marks")
 st.plotly_chart(fig_interview)
 
+# ...
 
-###################################################################################################################
 # Written Marks
-
-fig_written = go.Figure()
-
-for comm, color in comm_colors.items():
-    hist_data_comm = filtered_df[filtered_df["category"] == comm]["written"]
-    fig_written.add_trace(
-        go.Histogram(
-            x=hist_data_comm,
-            histnorm="probability",
-            name=comm,
-            marker_color=f"{color}",
-            opacity=0.7,
-        )
-    )
+fig_written = px.histogram(
+    filtered_df,
+    x="written",
+    color="category",
+    color_discrete_map=comm_colors,
+    marginal="box",
+    hover_data=filtered_df.columns,
+    nbins=20,
+    title="",
+)
 
 fig_written.update_layout(
-    barmode="overlay",
-    title_text="Distribution of Written Marks",
     xaxis_title="Written Marks",
-    yaxis_title="Probability",
+    yaxis_title="Frequency",
 )
 
 # Comments for Histogram (Written Marks)
-st.write("# Histogram (Written Marks)")
+st.header("Distribution of Written Marks")
 st.plotly_chart(fig_written)
+
+# ...
+
 
 # Add another blank row with an empty string
 st.markdown("")
