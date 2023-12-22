@@ -16,7 +16,7 @@ comm_colors = {
     "OBC": "rgb(141, 191, 242)",  # Pastel1[0]
     "SC": "rgb(180, 9, 232)",  # Pastel1[1]
     "ST": "rgb(232, 9, 46)",  # Pastel1[3] 
-    "GEN": "rgb(5, 5, 5)",  # Pastel1[4]
+    "GEN": "rgb(18, 18, 18)",  # Pastel1[4]
 }
 
 # Streamlit app
