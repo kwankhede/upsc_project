@@ -1,11 +1,12 @@
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 
 # Load data
 df = pd.read_csv("upsc.csv")
 
-# Add three new columns for adjusting the marks scale
+# Added three new columns for adjusting marks scale
 df["interview"] = (df.ptpct * 275).apply(int)
 df["written"] = (df.wtpct * 1750).apply(round).apply(int)
 df["total"] = (df.ftpct * 2025).apply(round).apply(int)
@@ -19,7 +20,7 @@ comm_colors = {
 }
 
 # Streamlit app
-st.title("UPSC Result (2007-2017): Data Analysis")
+st.title("UPSC Result (2007-2017) : Data Analysis ")
 st.markdown("")
 st.markdown("")
 
@@ -36,7 +37,7 @@ default_year_range = (2007, 2017)
 
 # Dropdown for filtering by 'category'
 selected_comm = st.sidebar.multiselect(
-    "Select Category(s)", df["category"].unique(), default_comm
+    "Select Category (s)", df["category"].unique(), default_comm
 )
 
 # Slider for filtering by 'written'
@@ -90,6 +91,8 @@ filtered_df = df[
     & (df["rank"] <= rank_range[1])
 ]
 
+
+st.header("<<---- Scatter Plots --->>")
 ########################################################################################
 # Scatter plot with fixed color mapping
 scatter_fig = px.scatter(
@@ -110,8 +113,131 @@ st.plotly_chart(scatter_fig)
 st.markdown("")
 st.markdown("")
 
+#################################################Scatter plots ############################################
+
+
+########################################################################################
+# Scatter plots for mean/median interview vs written marks for different categories
+
+# Calculate mean and median for each category
+category_stats = filtered_df.groupby("category").agg(
+    {"interview": ["mean", "median"], "written": ["mean", "median"]}
+)
+category_stats.reset_index(inplace=True)
+category_stats.columns = [
+    "category",
+    "mean_interview",
+    "median_interview",
+    "mean_written",
+    "median_written",
+]
+
+# Scatter plot for mean interview vs written marks
+mean_scatter_fig = px.scatter(
+    category_stats,
+    x="mean_written",
+    y="mean_interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    title="Mean Interview vs Written Marks by Categories",
+    text="category",  # Display category names on the plot
+)
+mean_scatter_fig.update_layout(
+    xaxis_title="Mean Written Marks", yaxis_title="Mean Interview Marks"
+)
+
+# Place text below points
+mean_scatter_fig.update_traces(textposition="bottom center")
+
+# Show plot
+st.header("Mean Interview vs Mean Written Marks by Categories")
+st.plotly_chart(mean_scatter_fig)
+st.markdown("")
+st.markdown("")
+
+# Scatter plot for median interview vs written marks
+median_scatter_fig = px.scatter(
+    category_stats,
+    x="median_written",
+    y="median_interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    title="Median Interview vs Written Marks by Categories",
+    text="category",  # Display category names on the plot
+)
+median_scatter_fig.update_layout(
+    xaxis_title="Median Written Marks", yaxis_title="Median Interview Marks"
+)
+
+# Place text below points
+median_scatter_fig.update_traces(textposition="bottom center")
+
+# Show plot
+st.header("Median Interview vs Median Written Marks by Categories")
+st.plotly_chart(median_scatter_fig)
+st.markdown("")
+st.markdown("")
+
+#########################################################################################################
+
+# Calculate top and bottom 10 percentile thresholds
+top_10_percentile_written = df["written"].quantile(0.9)
+bottom_10_percentile_written = df["written"].quantile(0.1)
+top_10_percentile_interview = df["interview"].quantile(0.9)
+bottom_10_percentile_interview = df["interview"].quantile(0.1)
+
+# Filter top and bottom 10 percentile scores
+top_10_percentile_df = df[
+    (df["written"] >= top_10_percentile_written)
+    & (df["interview"] >= top_10_percentile_interview)
+]
+bottom_10_percentile_df = df[
+    (df["written"] <= bottom_10_percentile_written)
+    & (df["interview"] <= bottom_10_percentile_interview)
+]
+
+# Scatter plot for top 10 percentile written vs interview marks
+top_10_percentile_scatter_fig = px.scatter(
+    top_10_percentile_df,
+    x="written",
+    y="interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    title="Top 10 Percentile: Written vs Interview Marks by Categories",
+)
+top_10_percentile_scatter_fig.update_layout(
+    xaxis_title="Written Marks", yaxis_title="Interview Marks"
+)
+
+# Show plot
+st.header("Top 10 Percentile: Written vs Interview Marks by Categories")
+st.plotly_chart(top_10_percentile_scatter_fig)
+st.markdown("")
+st.markdown("")
+
+# Scatter plot for bottom 10 percentile written vs interview marks
+bottom_10_percentile_scatter_fig = px.scatter(
+    bottom_10_percentile_df,
+    x="written",
+    y="interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    title="Bottom 10 Percentile: Written vs Interview Marks by Categories",
+)
+bottom_10_percentile_scatter_fig.update_layout(
+    xaxis_title="Written Marks", yaxis_title="Interview Marks"
+)
+
+# Show plot
+st.header("Bottom 10 Percentile: Written vs Interview Marks by Categories")
+st.plotly_chart(bottom_10_percentile_scatter_fig)
+st.markdown("")
+st.markdown("")
+
+
 ###################################################################################################################
 
+st.header("<<---- Pie Chart--->>")
 # Pie chart
 comm_counts = filtered_df["category"].value_counts()
 pie_fig = px.pie(
@@ -129,13 +255,16 @@ pie_fig.update_traces(
 )
 
 # Comments for Pie chart
-st.header("Categories-wise Candidates Distribution")
+st.header("Categories wise candidates distribution")
 st.plotly_chart(pie_fig)
 
 st.markdown("")
 st.markdown("")
 
+
 ###################################################################################################################
+st.header("<<---- Box Plots --->>")
+
 # Box plot for 'interview'
 box_fig = px.box(
     filtered_df,
@@ -177,7 +306,7 @@ box_fig.update_layout(
 )
 
 # Comments for Box plot
-st.header("Distribution of Categories Wise Interview Marks")
+st.header("Distribution of Categories Wise Interview Marks)")
 st.plotly_chart(box_fig)
 st.markdown("")
 st.markdown("")
@@ -229,8 +358,9 @@ st.plotly_chart(box_fig_written)
 st.markdown("")
 st.markdown("")
 
+
 ###################################################################################################################
-# ...
+st.header("<<---- Histograms--->>")
 
 # Add histograms for 'interview'
 fig_interview = px.histogram(
@@ -278,9 +408,100 @@ st.plotly_chart(fig_written)
 
 # ...
 
+
 # Add another blank row with an empty string
 st.markdown("")
 st.markdown("")
 st.markdown("")
 st.markdown("")
 st.markdown("")
+
+
+# Add histograms for 'interview'
+fig_interview = px.histogram(
+    filtered_df,
+    x="interview",
+    color="category",
+    color_discrete_map=comm_colors,
+    marginal="box",
+    hover_data=filtered_df.columns,
+    nbins=20,
+    title="",
+    histnorm="percent",  # Use "percent" for scaling to [0, 100]
+)
+
+fig_interview.update_layout(
+    xaxis_title="Interview Marks",
+    yaxis_title="Percentage",  # Update y-axis label for percent scale
+)
+
+# Comments for Histogram (Interview Marks)
+st.header("Distribution of Interview Marks")
+st.plotly_chart(fig_interview)
+
+# ...
+
+# Written Marks
+fig_written = px.histogram(
+    filtered_df,
+    x="written",
+    color="category",
+    color_discrete_map=comm_colors,
+    marginal="box",
+    hover_data=filtered_df.columns,
+    nbins=20,
+    title="",
+    histnorm="percent",  # Use "percent" for scaling to [0, 100]
+)
+
+fig_written.update_layout(
+    xaxis_title="Written Marks",
+    yaxis_title="Percentage",  # Update y-axis label for percent scale
+)
+
+# Comments for Histogram (Written Marks)
+st.header("Distribution of Written Marks")
+st.plotly_chart(fig_written)
+
+
+#######
+fig_2 = px.histogram(df, x="written", color="category")
+st.plotly_chart(fig_2)
+
+
+# Normalize the frequency from 1 to 100
+fig_3 = px.histogram(df, x="written", color="category", histnorm="percent")
+
+# Update the layout to reflect the percentage scale
+fig_3.update_layout(yaxis_title="Percentage")
+
+# Display the plot
+st.plotly_chart(fig_3)
+
+
+#######################Histograms#################
+
+# Create an interactive histogram for written marks
+histogram_written = px.histogram(
+    df,
+    x="written",
+    color="category",
+    barmode="overlay",
+    title="Interactive Histogram of Written Marks by Category",
+    labels={"written": "Written Marks", "category": "Category"},
+)
+
+# Create an interactive histogram for interview marks
+histogram_interview = px.histogram(
+    df,
+    x="interview",
+    color="category",
+    barmode="overlay",
+    title="Interactive Histogram of Interview Marks by Category",
+    labels={"interview": "Interview Marks", "category": "Category"},
+)
+
+
+# Display the histograms
+st.plotly_chart(histogram_written)
+st.plotly_chart(histogram_interview)
