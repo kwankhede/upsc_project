@@ -13,10 +13,10 @@ df["total"] = (df.ftpct * 2025).apply(round).apply(int)
 
 # Fixed colors for each 'Comm' category
 comm_colors = {
-    "OBC": "rgb(251,180,174)",  # Pastel1[0]
-    "SC": "rgb(204,235, 197)",  # Pastel1[1]
-    "ST": "rgb(222, 203, 228)",  # Pastel1[3]
-    "GEN": "rgb(254, 217, 166)",  # Pastel1[4]
+    "OBC": "rgb(141, 191, 242)",  # Pastel1[0]
+    "SC": "rgb(180, 9, 232)",  # Pastel1[1]
+    "ST": "rgb(232, 9, 46)",  # Pastel1[3] 
+    "GEN": "rgb(5, 5, 5)",  # Pastel1[4]
 }
 
 # Streamlit app
